@@ -11,14 +11,14 @@ Os diagramas abaixo ilustram os fluxos de automação para dois cenários de neg
 
 ### 1. Automação "Sem Parar" (Processamento Batch com EC2)
 
-Este fluxo representa uma automação baseada em servidor (EC2) que processa dados de transações de pedágio. Este modelo é ideal para tarefas agendadas (batch), como consolidação de dados no final do dia ou geração de relatórios.
+Este fluxo representa uma automação baseada em servidor (EC2) que processa dados de transações. Este modelo é ideal para tarefas agendadas (batch), como consolidação de dados no final do dia ou geração de relatórios.
 
-**Fluxo da Automação:**
-1.  **Cliente (Veículo):** O cliente passa pela cancela de pedágio.
-2.  **Sensor/Portagem:** O sistema de portagem registra a passagem e envia os dados da transação.
-3.  **EC2 Instance:** Um servidor virtual recebe e armazena esses dados em seu disco (Volume EBS).
-4.  **Crontab (Agendador):** Dentro da EC2, um agendador (Crontab do Linux) executa um script Python em um horário definido (ex: toda madrugada).
-5.  **Script Python:** O script processa todas as transações acumuladas, calcula os débitos e se comunica com o sistema central do Sem Parar para atualizar as contas dos clientes.
+**Descrição do Fluxo (Diagrama):**
+1.  **EC2 Instance:** Um servidor virtual (Instância EC2) está em execução, servindo como o cérebro da operação.
+2.  **EBS Volume:** Um disco (Volume EBS) está anexado à instância. Ele armazena o sistema operacional, o script Python e os dados temporários.
+3.  **Crontab Schedule:** Um agendador de tarefas (Crontab) dentro da própria instância EC2 é programado para disparar o script em horários específicos (ex: toda madrugada).
+4.  **Python Script + Boto3:** No horário agendado, o script Python é executado. Ele usa a biblioteca Boto3 para interagir com serviços (se necessário) e contém a lógica para se comunicar com o sistema externo.
+5.  **Sem Parar Automation:** O script envia os dados processados (ex: transações de pedágio) para o sistema final do Sem Parar.
 
 ![Diagrama da Automação Sem Parar](./images/automacao-semparar.png)
 
@@ -26,16 +26,15 @@ Este fluxo representa uma automação baseada em servidor (EC2) que processa dad
 
 Este fluxo representa uma arquitetura "Serverless" (sem servidor) que processa pedidos de clientes em tempo real. Este modelo é ideal para processamento orientado a eventos, sendo altamente escalável e econômico.
 
-**Fluxo da Automação:**
-1.  **Cliente (App Bob's):** O cliente faz um pedido através do aplicativo.
-2.  **API Gateway:** O aplicativo envia o pedido (ex: um arquivo JSON) para um "portão de entrada" da AWS.
-3.  **S3 Bucket (FilaDePedidos):** O API Gateway salva o arquivo do pedido em um S3 Bucket, que atua como uma fila de entrada.
-4.  **Event Trigger (S3 -> Lambda):** O S3 automaticamente detecta a chegada do novo arquivo (`ObjectCreated`) e dispara uma função Lambda.
-5.  **Lambda Function (ProcessarPedido):** A função Lambda (código que roda sob demanda) lê o arquivo do pedido, valida os dados e o formata.
-6.  **DynamoDB (Banco de Dados):** A Lambda insere os detalhes do pedido em um banco de dados NoSQL para registro.
-7.  **Sistema Bob's:** O sistema interno do restaurante é notificado (ou consulta o DynamoDB) e o pedido é enviado para a fila de preparo na cozinha.
+**Descrição do Fluxo (Diagrama):**
+1.  **S3 Bucket (bobs-order-queue):** Um cliente (ex: o aplicativo do Bob's) envia um novo pedido. Esse pedido é salvo como um novo arquivo (objeto) dentro deste "balde" (Bucket) S3, que atua como uma fila de entrada.
+2.  **ObjectCreated (Event Trigger):** A chegada do novo arquivo no S3 dispara automaticamente (`Event Trigger`) uma função Lambda.
+3.  **Lambda Function (ProcessOrder):** A função Lambda é executada instantaneamente. Seu código (ex: `ProcessOrder`) lê o arquivo do pedido, valida os dados e o formata.
+4.  **DynamoDB (OrderDetails):** A função Lambda salva os detalhes do pedido já processados em um banco de dados DynamoDB, que é rápido e flexível.
+5.  **Bob's Order Processing:** O sistema interno da cozinha do Bob's é notificado ou consulta o DynamoDB para buscar novos pedidos e iniciar o preparo.
+6.  **SMS Notification:** (Opcional) A própria função Lambda também pode enviar uma notificação por SMS para o cliente, confirmando que o pedido foi recebido.
 
-![Diagrama da Automação Bob's](./images/automacao-bobs.png)
+![Diagrama da Automação Bob's](./images/automacao-bobs.jpg)
 
 ## Tecnologias Utilizadas
 
@@ -43,6 +42,5 @@ Este fluxo representa uma arquitetura "Serverless" (sem servidor) que processa p
 * **AWS EBS (Elastic Block Store):** O "disco rígido" virtual para a instância EC2.
 * **AWS S3 (Simple Storage Service):** Armazenamento de objetos usado como "fila" para receber os pedidos.
 * **AWS Lambda:** Serviço de computação sem servidor para processar os pedidos em tempo real.
-* **AWS API Gateway:** Ponto de entrada (API) para receber os pedidos do aplicativo.
 * **AWS DynamoDB:** Banco de dados NoSQL para armazenar os detalhes dos pedidos.
 * **Crontab:** Agendador de tarefas baseado em Linux (usado dentro da EC2).
