@@ -23,6 +23,7 @@ Este fluxo representa uma automação baseada em servidor (EC2) que processa dad
 <p style="font-size: 40px; color: lightblue;">
   Diagrama Sem Parar
 </p>
+
 <img width="801" height="411" alt="automacao-semparar" src="https://github.com/user-attachments/assets/694a4c69-2e93-41d1-bd43-9f2e158b2f8f" />
 
 
@@ -39,6 +40,7 @@ Este fluxo representa uma arquitetura "Serverless" (sem servidor) que processa p
 <div style="font-size: 40px; color: lightblue;">
   Diagrama Bobs
 </div>
+
 
 <img width="812" height="692" alt="automacao-bobs" src="https://github.com/user-attachments/assets/da638094-9058-403c-9f97-a55547101268" />
 
