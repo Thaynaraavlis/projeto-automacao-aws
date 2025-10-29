@@ -20,9 +20,9 @@ Este fluxo representa uma automação baseada em servidor (EC2) que processa dad
 4.  **Python Script + Boto3:** No horário agendado, o script Python é executado. Ele usa a biblioteca Boto3 para interagir com serviços (se necessário) e contém a lógica para se comunicar com o sistema externo.
 5.  **Sem Parar Automation:** O script envia os dados processados (ex: transações de pedágio) para o sistema final do Sem Parar.
 
-<div style="font-size: 40px; color: lightblue;">
+<p style="font-size: 40px; color: lightblue;">
   Diagrama Sem Parar
-</div>
+</p>
 <img width="801" height="411" alt="automacao-semparar" src="https://github.com/user-attachments/assets/694a4c69-2e93-41d1-bd43-9f2e158b2f8f" />
 
 
@@ -37,7 +37,7 @@ Este fluxo representa uma arquitetura "Serverless" (sem servidor) que processa p
 6.  **SMS Notification:** (Opcional) A própria função Lambda também pode enviar uma notificação por SMS para o cliente, confirmando que o pedido foi recebido.
 
 <div style="font-size: 40px; color: lightblue;">
-  Diagrama Bob's
+  Diagrama Bobs
 </div>
 
 <img width="812" height="692" alt="automacao-bobs" src="https://github.com/user-attachments/assets/da638094-9058-403c-9f97-a55547101268" />
